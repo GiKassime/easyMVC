@@ -1,17 +1,17 @@
 <html>
     <head>
-        <title>Cadastro de cursos</title>
+        <title>Cadastro de autor</title>
         <link rel="stylesheet" href="../css/estilos.css">
     </head>
     <body>
-        <form action="../control/cursosControl.php?a=1" method="post">
-        <h1>Cadastro de cursos</h1>
+        <form action="../control/autorControl.php?a=1" method="post">
+        <h1>Cadastro de autor</h1>
             <label for='id'>id</label>
 <input type='text' name='id'><br>
 <label for='nome'>nome</label>
 <input type='text' name='nome'><br>
-<label for='turno'>turno</label>
-<input type='text' name='turno'><br>
+<label for='nacionalidade'>nacionalidade</label>
+<input type='text' name='nacionalidade'><br>
 
              <button type="submit">Enviar</button>
         </form>

@@ -161,8 +161,9 @@ HTML;
         $attr = "";
         foreach ($this->buscaAtributos($nomeTabela) as $atributo) {
             $atributo = $atributo->Field;
-            $attr.= "echo \$dado['{$atributo}'];";
+            $attr.= "<th> {$atributo}</th>";
         }
+        $attr.= "<th>Excluir</th><th>Alterar</th>";
         $conteudo = "";
         $conteudo = <<<HTML
 <html>
@@ -171,15 +172,31 @@ HTML;
         <link rel="stylesheet" href="../css/estilos.css">
     </head>
     <body>
+        <div class="tabela-container">
         <h1>Lista de {$nomeTabela}</h1>
+        <table border='1'>
+            <thead>
+                <tr>
+                $attr
+            </tr>
+        </thead>
+        <tbody>
         <?php
         require_once("../dao/{$nomeTabelaUC}Dao.php");
         \$dao=new {$nomeTabelaUC}Dao();
         \$dados=\$dao->listaGeral();
         foreach(\$dados as \$dado){
-            {$attr}
+            echo "<tr>";
+            foreach(\$dado as \$valor){
+                echo "<td>\$valor</td>";
+            }
+            echo "<td>excluir</td><td>alterar</td>";
+            echo "</tr>";
         }
         ?>
+    </tbody>
+</table>
+</div>
     </body>
 </html>
 HTML;

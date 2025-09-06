@@ -71,3 +71,11 @@ button {
 button:hover {
     background-color: #45a049;
 }
+.tabela-container {
+  max-width: 900px;
+  margin: 40px auto 0 auto;
+  padding: 24px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}

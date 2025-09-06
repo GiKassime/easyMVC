@@ -1,21 +1,22 @@
 <?php
 require_once("../model/conexao.php");
-class CursosDao {
+class ClientesDao {
     private $con;
     public function __construct(){
        $this->con=(new Conexao())->conectar();
     }
 function inserir($obj) {
-    $sql = "INSERT INTO cursos (id, nome, turno) VALUES (?, ?, ?)";
+    $sql = "INSERT INTO clientes (id_cliente, nome, email, telefone) VALUES (?, ?, ?, ?)";
     $stmt = $this->con->prepare($sql);
-    $id=$obj->getId();
+    $id_cliente=$obj->getId_cliente();
 $nome=$obj->getNome();
-$turno=$obj->getTurno();
+$email=$obj->getEmail();
+$telefone=$obj->getTelefone();
 
-    $stmt->execute([$id,$nome,$turno]);
+    $stmt->execute([$id_cliente,$nome,$email,$telefone]);
 }
 function listaGeral(){
-    $sql = "SELECT * FROM cursos";
+    $sql = "SELECT * FROM clientes";
     $query = $this->con->query($sql);    
     $dados = $query->fetchAll(PDO::FETCH_ASSOC);
     return $dados;
