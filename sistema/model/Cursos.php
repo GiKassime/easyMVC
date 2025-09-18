@@ -1,8 +1,8 @@
 <?php
-class Autor {
+class Cursos {
 	private $id;
 	private $nome;
-	private $nacionalidade;
+	private $turno;
 
 	function getId(){
 		return $this->id;
@@ -16,11 +16,11 @@ class Autor {
 	function setNome($nome){
 		$this->nome=$nome;
 	}
-	function getNacionalidade(){
-		return $this->nacionalidade;
+	function getTurno(){
+		return $this->turno;
 	}
-	function setNacionalidade($nacionalidade){
-		$this->nacionalidade=$nacionalidade;
+	function setTurno($turno){
+		$this->turno=$turno;
 	}
 
 }

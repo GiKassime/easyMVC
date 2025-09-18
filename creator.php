@@ -1,17 +1,19 @@
 <?php
-ini_set('display_errors',1);
-ini_set('display_startup_erros',1);
+ini_set('display_errors', 1);
+ini_set('display_startup_erros', 1);
 error_reporting(E_ALL);
-class Creator {
+class Creator
+{
     private $con;
-    private $servidor ;
+    private $servidor;
     private $banco;
     private $usuario;
     private $senha;
     private $tabelas;
 
-    function __construct() {
-        if(isset($_GET['id']))
+    function __construct()
+    {
+        if (isset($_GET['id']))
             $this->buscaBancodeDados();
         else {
             $this->criaDiretorios();
@@ -25,8 +27,9 @@ class Creator {
             $this->compactar();
             header("Location:index.php?msg=2");
         }
-    }//fimConsytruct
-    function criaDiretorios() {
+    } //fimConsytruct
+    function criaDiretorios()
+    {
         $dirs = [
             "sistema",
             "sistema/model",
@@ -43,19 +46,17 @@ class Creator {
                 }
             }
         }
-        copy('estilos.css','sistema/css/estilos.css');
-    }//fimDiretorios
-    function conectar($id){
+        copy('estilos.css', 'sistema/css/estilos.css');
+    } //fimDiretorios
+    function conectar($id)
+    {
         $this->servidor = $_REQUEST["servidor"];
         $this->usuario = $_REQUEST["usuario"];
         $this->senha = $_REQUEST["senha"];
         if ($id == 1) {
-           $this->banco = $_POST["banco"];
-        }
-        else{
+            $this->banco = $_POST["banco"];
+        } else {
             $this->banco = "mysql";
-
-
         }
         try {
             $this->con = new PDO(
@@ -65,56 +66,57 @@ class Creator {
             );
         } catch (Exception $e) {
 
-           header("Location:index.php?msg=1");
+            header("Location:index.php?msg=1");
         }
-    }//fimConectar
-    function buscaBancodeDados(){
+    } //fimConectar
+    function buscaBancodeDados()
+    {
         try {
-                $this->conectar(0);
-                $sql = "SHOW databases";
-                $query = $this->con->query($sql);
-                $databases = $query->fetchAll(PDO::FETCH_ASSOC);
-                foreach ($databases as $database){
-                    echo "<option>".$database["Database"]."</option>";
-                }
-                $this->con=null;
+            $this->conectar(0);
+            $sql = "SHOW databases";
+            $query = $this->con->query($sql);
+            $databases = $query->fetchAll(PDO::FETCH_ASSOC);
+            foreach ($databases as $database) {
+                echo "<option>" . $database["Database"] . "</option>";
             }
-        catch (Exception $e) {
+            $this->con = null;
+        } catch (Exception $e) {
             header("Location:index.php?msg=3");
-
         }
-    }//uscaBD
-    function buscaTabelas(){
-       try {
-           $sql = "SHOW TABLES";
-           $query = $this->con->query($sql);
-           $this->tabelas = $query->fetchAll(PDO::FETCH_ASSOC);
-       }
-       catch (Exception $e) {
-           header("Location:index.php?msg=3");
-       }
-    }//fimBuscaTabelas
-    function buscaAtributos($nomeTabela){
-        $sql="show columns from ".$nomeTabela;
+    } //uscaBD
+    function buscaTabelas()
+    {
+        try {
+            $sql = "SHOW TABLES";
+            $query = $this->con->query($sql);
+            $this->tabelas = $query->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            header("Location:index.php?msg=3");
+        }
+    } //fimBuscaTabelas
+    function buscaAtributos($nomeTabela)
+    {
+        $sql = "show columns from " . $nomeTabela;
         $atributos = $this->con->query($sql)->fetchAll(PDO::FETCH_OBJ);
         return $atributos;
-    }//fimBuscaAtributos
-    function ClassesModel() {
+    } //fimBuscaAtributos
+    function ClassesModel()
+    {
         foreach ($this->tabelas as $tabela) {
             $nomeTabela = array_values((array) $tabela)[0];
-            $atributos=$this->buscaAtributos($nomeTabela);
-            $nomeAtributos="";
-            $geters_seters="";
+            $atributos = $this->buscaAtributos($nomeTabela);
+            $nomeAtributos = "";
+            $geters_seters = "";
             foreach ($atributos as $atributo) {
-                $atributo=$atributo->Field;
-                $nomeAtributos.="\tprivate \${$atributo};\n";
-                $metodo=ucfirst($atributo);
-                $geters_seters.="\tfunction get".$metodo."(){\n";
-                $geters_seters.="\t\treturn \$this->{$atributo};\n\t}\n";
-                $geters_seters.="\tfunction set".$metodo."(\${$atributo}){\n";
-                $geters_seters.="\t\t\$this->{$atributo}=\${$atributo};\n\t}\n";
+                $atributo = $atributo->Field;
+                $nomeAtributos .= "\tprivate \${$atributo};\n";
+                $metodo = ucfirst($atributo);
+                $geters_seters .= "\tfunction get" . $metodo . "(){\n";
+                $geters_seters .= "\t\treturn \$this->{$atributo};\n\t}\n";
+                $geters_seters .= "\tfunction set" . $metodo . "(\${$atributo}){\n";
+                $geters_seters .= "\t\t\$this->{$atributo}=\${$atributo};\n\t}\n";
             }
-            $nomeTabela=ucfirst($nomeTabela);
+            $nomeTabela = ucfirst($nomeTabela);
             $conteudo = <<<EOT
 <?php
 class {$nomeTabela} {
@@ -124,16 +126,20 @@ class {$nomeTabela} {
 ?>
 EOT;
             file_put_contents("sistema/model/{$nomeTabela}.php", $conteudo);
-
         }
-    }//fimModel
-    function classesView() {
+    } //fimModel
+    function classesView()
+    {
+        //formulários
+        
         foreach ($this->tabelas as $tabela) {
             $nomeTabela = array_values((array) $tabela)[0];
-            $atributos=$this->buscaAtributos($nomeTabela);
-            $formCampos="";
-           foreach ($atributos as $atributo) {
-                $atributo=$atributo->Field;
+                        $nomeTabelaUC = ucfirst($nomeTabela);
+
+            $atributos = $this->buscaAtributos($nomeTabela);
+            $formCampos = "";
+            foreach ($atributos as $atributo) {
+                $atributo = $atributo->Field;
                 $formCampos .= "<label for='{$atributo}'>{$atributo}</label>\n";
                 $formCampos .= "<input type='text' name='{$atributo}'><br>\n";
             }
@@ -152,58 +158,54 @@ EOT;
     </body>
 </html>
 HTML;
-  file_put_contents("sistema/view/{$nomeTabela}.php", $conteudo); // Exemplo salvando como arquivo
+
+            file_put_contents("sistema/view/{$nomeTabelaUC}.php", $conteudo); // Exemplo salvando como arquivo
         }
-    //LISTAS
-    foreach ($this->tabelas as $tabela ) {
-        $nomeTabela = array_values((array)$tabela)[0];
-        $nomeTabelaUC=ucfirst($nomeTabela);
-        $attr = "";
-        foreach ($this->buscaAtributos($nomeTabela) as $atributo) {
-            $atributo = $atributo->Field;
-            $attr.= "<th> {$atributo}</th>";
-        }
-        $attr.= "<th>Excluir</th><th>Alterar</th>";
-        $conteudo = "";
-        $conteudo = <<<HTML
+        //Listas
+        foreach ($this->tabelas as $tabela) {
+            $nomeTabela = array_values((array)$tabela)[0];
+            $nomeTabelaUC = ucfirst($nomeTabela);
+            $atributos = $this->buscaAtributos($nomeTabela);
+            $attr = "";
+            $id = "";
+            foreach ($atributos as $atributo) {
+                if ($atributo->Key == "PRI") {
+                    $id = "{\$dado['{$atributo->Field}']}";
+                }
+                $attr .= "echo \" <td>{\$dado['{$atributo->Field}']}</td>\";\n";
+            }
+            $conteudo = "";
+            $conteudo = <<<HTML
+
 <html>
     <head>
-        <title>Lista de {$nomeTabela}</title>
+        <title>Lista de {$nomeTabelaUC}</title>
         <link rel="stylesheet" href="../css/estilos.css">
     </head>
     <body>
-        <div class="tabela-container">
-        <h1>Lista de {$nomeTabela}</h1>
-        <table border='1'>
-            <thead>
-                <tr>
-                $attr
-            </tr>
-        </thead>
-        <tbody>
         <?php
         require_once("../dao/{$nomeTabelaUC}Dao.php");
-        \$dao=new {$nomeTabelaUC}Dao();
+        \$dao=new {$nomeTabela}DAO();
         \$dados=\$dao->listaGeral();
+        echo "<table border=1>";
         foreach(\$dados as \$dado){
             echo "<tr>";
-            foreach(\$dado as \$valor){
-                echo "<td>\$valor</td>";
-            }
-            echo "<td>excluir</td><td>alterar</td>";
-            echo "</tr>";
+        {$attr}
+        echo "<td><a href='../control/{$nomeTabela}Control.php?a=2&id={$id}'>Excluir</a></td>";
+        echo "<td>Alterar</td>";
+        echo "</tr>";
         }
-        ?>
-    </tbody>
-</table>
-</div>
+        echo "</table>";
+        ?>  
     </body>
 </html>
 HTML;
-        file_put_contents("sistema/view/Lista{$nomeTabela}.php", $conteudo);
-    }
-}//fimView
-    function ClasseConexao(){
+            file_put_contents("sistema/view/Lista{$nomeTabelaUC}.php", $conteudo);
+        }
+    } //fimView
+
+    function ClasseConexao()
+    {
         $conteudo = <<<EOT
 
 <?php
@@ -218,6 +220,7 @@ class Conexao {
         \$this->usuario = '{$this->usuario}';
         \$this->senha = '{$this->senha}';
     }
+    
     function conectar() {
         try {
             \$conn = new PDO(
@@ -233,16 +236,17 @@ class Conexao {
 ?>
 EOT;
         file_put_contents("sistema/model/conexao.php", $conteudo);
-    }//fimConexao
-    function ClassesControl(){
+    } //fimConexao
+    function ClassesControl()
+    {
         foreach ($this->tabelas as $tabela) {
             $nomeTabela = array_values((array)$tabela)[0];
-            $atributos=$this->buscaAtributos($nomeTabela);
-            $nomeClasse=ucfirst($nomeTabela);
-            $posts="";
+            $atributos = $this->buscaAtributos($nomeTabela);
+            $nomeClasse = ucfirst($nomeTabela);
+            $posts = "";
             foreach ($atributos as $atributo) {
-                $atributo=$atributo->Field;
-                $posts.= "\$this->{$nomeTabela}->set".ucFirst($atributo).
+                $atributo = $atributo->Field;
+                $posts .= "\$this->{$nomeTabela}->set" . ucFirst($atributo) .
                     "(\$_POST['{$atributo}']);\n\t\t";
             }
 
@@ -265,13 +269,19 @@ class {$nomeClasse}Control {
           case 1:
             \$this->inserir();
           break;
+          case 2:
+            \$this->excluir();
+          break;
        }
     }
     function inserir(){
         {$posts}
         \$this->dao->inserir(\$this->{$nomeTabela});
     }
-    function excluir(){}
+    function excluir(){
+            
+        \$this->dao->excluir(\$_REQUEST['id']);
+    }
     function alterar(){}
     function buscarId({$nomeClasse} \${$nomeTabela}){}
     function buscaTodos(){}
@@ -282,9 +292,9 @@ new {$nomeClasse}Control();
 EOT;
             file_put_contents("sistema/control/{$nomeTabela}Control.php", $conteudo);
         }
-
-    }//fimControl
-    function compactar() {
+    } //fimControl
+    function compactar()
+    {
         $folderToZip = 'sistema';
         $outputZip = 'sistema.zip';
         $zip = new ZipArchive();
@@ -308,27 +318,35 @@ EOT;
         }
 
         return $zip->close();
-    }//fimCompactar
-    function ClassesDao(){
-     foreach ($this->tabelas as $tabela) {
+    } //fimCompactar
+
+    function ClassesDao()
+    {
+        foreach ($this->tabelas as $tabela) {
             $nomeTabela = array_values((array)$tabela)[0];
             $nomeClasse = ucfirst($nomeTabela);
-            $atributos=$this->buscaAtributos($nomeTabela);
-            $atributos = array_map(function($obj) {
-             return $obj->Field;
-         }, $atributos);
+            $atributos = $this->buscaAtributos($nomeTabela);
+            $id = "";
+            foreach ($atributos as $atributo) {
+                if($atributo->Key == "PRI"){
+                    $id = $atributo->Field;
+                }
+            }
+            $atributos = array_map(function ($obj) {
+                return $obj->Field;
+            }, $atributos);
             $sqlCols = implode(', ', $atributos);
             $placeholders = implode(', ', array_fill(0, count($atributos), '?'));
-         $vetAtributos=[];
-         $AtributosMetodos="";
-         foreach ($atributos as $atributo) {
-             $atr=ucfirst($atributo);
-             array_push($vetAtributos,"\${$atributo}");
-             $AtributosMetodos.="\${$atributo}=\$obj->get{$atr}();\n";
-         }
-         $atributosOk=implode(",",$vetAtributos);
+            $vetAtributos = [];
+            $AtributosMetodos = "";
+            foreach ($atributos as $atributo) {
+                $atr = ucfirst($atributo);
+                array_push($vetAtributos, "\${$atributo}");
+                $AtributosMetodos .= "\${$atributo}=\$obj->get{$atr}();\n";
+            }
+            $atributosOk = implode(",", $vetAtributos);
 
-         $conteudo = <<<EOT
+            $conteudo = <<<EOT
 <?php
 require_once("../model/conexao.php");
 class {$nomeClasse}Dao {
@@ -343,19 +361,22 @@ function inserir(\$obj) {
     \$stmt->execute([{$atributosOk}]);
 }
 function listaGeral(){
-    \$sql = "SELECT * FROM {$nomeTabela}";
-    \$query = \$this->con->query(\$sql);    
+    \$sql = "select * from {$nomeTabela}";
+    \$query = \$this->con->query(\$sql);
     \$dados = \$query->fetchAll(PDO::FETCH_ASSOC);
     return \$dados;
 }
-
+function excluir(\$id){
+    \$sql = "Delete from {$nomeTabela} where {$id} =\$id";
+    \$query = \$this->con->query(\$sql);
+    header("Location: ../view/Lista{$nomeClasse}.php");
+}
 }
 ?>
 EOT;
             file_put_contents("sistema/dao/{$nomeClasse}Dao.php", $conteudo);
         }
-
-    }//fimDao
+    } //fimDao
 
 }
 new Creator();

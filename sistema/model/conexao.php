@@ -7,10 +7,11 @@ class Conexao {
     private $senha;
     function __construct() {
         $this->server = 'localhost';
-        $this->banco = 'bibliotecapw';
+        $this->banco = 'db_alunos';
         $this->usuario = 'root';
-        $this->senha = 'root';
+        $this->senha = 'bancodedados';
     }
+    
     function conectar() {
         try {
             $conn = new PDO(
