@@ -7,9 +7,9 @@ class Conexao {
     private $senha;
     function __construct() {
         $this->server = 'localhost';
-        $this->banco = 'db_alunos';
+        $this->banco = 'biblioteca';
         $this->usuario = 'root';
-        $this->senha = 'bancodedados';
+        $this->senha = 'root';
     }
     
     function conectar() {

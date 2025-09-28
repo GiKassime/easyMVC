@@ -10,6 +10,7 @@ class Creator
     private $usuario;
     private $senha;
     private $tabelas;
+    private $nomeSistema;
 
     function __construct()
     {
@@ -19,17 +20,21 @@ class Creator
             $this->criaDiretorios();
             $this->conectar(1);
             $this->buscaTabelas();
+            $this->nomeSistema = $_POST["nome"];
+            $this->criaIndex();
             $this->ClassesModel();
             $this->ClasseConexao();
             $this->ClassesControl();
             $this->classesView();
             $this->ClassesDao();
+
             $this->compactar();
             header("Location:index.php?msg=2");
         }
     } //fimConsytruct
     function criaDiretorios()
     {
+
         $dirs = [
             "sistema",
             "sistema/model",
@@ -38,7 +43,6 @@ class Creator
             "sistema/dao",
             "sistema/css"
         ];
-
         foreach ($dirs as $dir) {
             if (!file_exists($dir)) {
                 if (!mkdir($dir, 0777, true)) {
@@ -83,7 +87,7 @@ class Creator
         } catch (Exception $e) {
             header("Location:index.php?msg=3");
         }
-    } //uscaBD
+    } //BuscaBD
     function buscaTabelas()
     {
         try {
@@ -116,10 +120,10 @@ class Creator
                 $geters_seters .= "\tfunction set" . $metodo . "(\${$atributo}){\n";
                 $geters_seters .= "\t\t\$this->{$atributo}=\${$atributo};\n\t}\n";
             }
-            $nomeTabela = ucfirst($nomeTabela);
+            $nomeClasse = ucfirst($nomeTabela);
             $conteudo = <<<EOT
 <?php
-class {$nomeTabela} {
+class {$nomeClasse} {
 {$nomeAtributos}
 {$geters_seters}
 }
@@ -128,82 +132,6 @@ EOT;
             file_put_contents("sistema/model/{$nomeTabela}.php", $conteudo);
         }
     } //fimModel
-    function classesView()
-    {
-        //formulários
-        
-        foreach ($this->tabelas as $tabela) {
-            $nomeTabela = array_values((array) $tabela)[0];
-                        $nomeTabelaUC = ucfirst($nomeTabela);
-
-            $atributos = $this->buscaAtributos($nomeTabela);
-            $formCampos = "";
-            foreach ($atributos as $atributo) {
-                $atributo = $atributo->Field;
-                $formCampos .= "<label for='{$atributo}'>{$atributo}</label>\n";
-                $formCampos .= "<input type='text' name='{$atributo}'><br>\n";
-            }
-            $conteudo = <<<HTML
-<html>
-    <head>
-        <title>Cadastro de {$nomeTabela}</title>
-        <link rel="stylesheet" href="../css/estilos.css">
-    </head>
-    <body>
-        <form action="../control/{$nomeTabela}Control.php?a=1" method="post">
-        <h1>Cadastro de {$nomeTabela}</h1>
-            {$formCampos}
-             <button type="submit">Enviar</button>
-        </form>
-    </body>
-</html>
-HTML;
-
-            file_put_contents("sistema/view/{$nomeTabelaUC}.php", $conteudo); // Exemplo salvando como arquivo
-        }
-        //Listas
-        foreach ($this->tabelas as $tabela) {
-            $nomeTabela = array_values((array)$tabela)[0];
-            $nomeTabelaUC = ucfirst($nomeTabela);
-            $atributos = $this->buscaAtributos($nomeTabela);
-            $attr = "";
-            $id = "";
-            foreach ($atributos as $atributo) {
-                if ($atributo->Key == "PRI") {
-                    $id = "{\$dado['{$atributo->Field}']}";
-                }
-                $attr .= "echo \" <td>{\$dado['{$atributo->Field}']}</td>\";\n";
-            }
-            $conteudo = "";
-            $conteudo = <<<HTML
-
-<html>
-    <head>
-        <title>Lista de {$nomeTabelaUC}</title>
-        <link rel="stylesheet" href="../css/estilos.css">
-    </head>
-    <body>
-        <?php
-        require_once("../dao/{$nomeTabelaUC}Dao.php");
-        \$dao=new {$nomeTabela}DAO();
-        \$dados=\$dao->listaGeral();
-        echo "<table border=1>";
-        foreach(\$dados as \$dado){
-            echo "<tr>";
-        {$attr}
-        echo "<td><a href='../control/{$nomeTabela}Control.php?a=2&id={$id}'>Excluir</a></td>";
-        echo "<td>Alterar</td>";
-        echo "</tr>";
-        }
-        echo "</table>";
-        ?>  
-    </body>
-</html>
-HTML;
-            file_put_contents("sistema/view/Lista{$nomeTabelaUC}.php", $conteudo);
-        }
-    } //fimView
-
     function ClasseConexao()
     {
         $conteudo = <<<EOT
@@ -245,6 +173,9 @@ EOT;
             $nomeClasse = ucfirst($nomeTabela);
             $posts = "";
             foreach ($atributos as $atributo) {
+                if ($atributo->Key == "PRI")
+                    continue;
+
                 $atributo = $atributo->Field;
                 $posts .= "\$this->{$nomeTabela}->set" . ucFirst($atributo) .
                     "(\$_POST['{$atributo}']);\n\t\t";
@@ -252,8 +183,8 @@ EOT;
 
             $conteudo = <<<EOT
 <?php
-require_once("../model/{$nomeClasse}.php");
-require_once("../dao/{$nomeClasse}Dao.php");
+require_once("../model/{$nomeTabela}.php");
+require_once("../dao/{$nomeTabela}Dao.php");
 class {$nomeClasse}Control {
     private \${$nomeTabela};
     private \$acao;
@@ -272,19 +203,24 @@ class {$nomeClasse}Control {
           case 2:
             \$this->excluir();
           break;
+        case 3:
+            \$this->alterar();
+          break;
        }
     }
+  
     function inserir(){
         {$posts}
         \$this->dao->inserir(\$this->{$nomeTabela});
     }
     function excluir(){
-            
         \$this->dao->excluir(\$_REQUEST['id']);
     }
-    function alterar(){}
+    function alterar(){
+        {$posts}
+        \$this->dao->alterar(\$this->{$nomeTabela}, \$_REQUEST['id']);
+    }
     function buscarId({$nomeClasse} \${$nomeTabela}){}
-    function buscaTodos(){}
 
 }
 new {$nomeClasse}Control();
@@ -319,7 +255,6 @@ EOT;
 
         return $zip->close();
     } //fimCompactar
-
     function ClassesDao()
     {
         foreach ($this->tabelas as $tabela) {
@@ -328,24 +263,31 @@ EOT;
             $atributos = $this->buscaAtributos($nomeTabela);
             $id = "";
             foreach ($atributos as $atributo) {
-                if($atributo->Key == "PRI"){
+                if ($atributo->Key == "PRI")
                     $id = $atributo->Field;
-                }
             }
             $atributos = array_map(function ($obj) {
+                if ($obj->Key == "PRI"){
+                    return null; // Ignora a chave primária
+                }
                 return $obj->Field;
             }, $atributos);
+            // Remove valores null pra tirar ali a primaria
+            $atributos = array_filter($atributos, function($valor) { return !is_null($valor); });
             $sqlCols = implode(', ', $atributos);
             $placeholders = implode(', ', array_fill(0, count($atributos), '?'));
+            // Para UPDATE: campo1=?, campo2=? ....... 
+            $sqlUpdate = implode('=?, ', $atributos) . '=?';
             $vetAtributos = [];
             $AtributosMetodos = "";
+
             foreach ($atributos as $atributo) {
+                //$id=$atributos[0];
                 $atr = ucfirst($atributo);
                 array_push($vetAtributos, "\${$atributo}");
                 $AtributosMetodos .= "\${$atributo}=\$obj->get{$atr}();\n";
             }
             $atributosOk = implode(",", $vetAtributos);
-
             $conteudo = <<<EOT
 <?php
 require_once("../model/conexao.php");
@@ -359,6 +301,7 @@ function inserir(\$obj) {
     \$stmt = \$this->con->prepare(\$sql);
     {$AtributosMetodos}
     \$stmt->execute([{$atributosOk}]);
+    header("Location:../view/lista{$nomeClasse}.php");
 }
 function listaGeral(){
     \$sql = "select * from {$nomeTabela}";
@@ -367,16 +310,251 @@ function listaGeral(){
     return \$dados;
 }
 function excluir(\$id){
-    \$sql = "Delete from {$nomeTabela} where {$id} =\$id";
+    \$sql = "delete from {$nomeTabela} where {$id}=\$id";
     \$query = \$this->con->query(\$sql);
-    header("Location: ../view/Lista{$nomeClasse}.php");
+    header("Location:../view/lista{$nomeClasse}.php");
+}
+function buscaPorId(\$id){
+    \$sql = "select * from {$nomeTabela} where {$id}=\$id";
+    \$query = \$this->con->query(\$sql);
+    \$dados = \$query->fetch(PDO::FETCH_ASSOC);
+    return \$dados;
+}
+function alterar(\$obj, \$idValue){
+    \$sql = "UPDATE {$nomeTabela} SET {$sqlUpdate} WHERE {$id}=?";
+    \$stmt = \$this->con->prepare(\$sql);
+    {$AtributosMetodos}
+    \$stmt->execute([{$atributosOk}, \$idValue]);
+    header("Location:../view/lista{$nomeClasse}.php");
 }
 }
 ?>
 EOT;
-            file_put_contents("sistema/dao/{$nomeClasse}Dao.php", $conteudo);
+            file_put_contents("sistema/dao/{$nomeTabela}Dao.php", $conteudo);
         }
     } //fimDao
+    //funcao para verificar apenas o tipo do campo lada database
+    function verificaTipo($tipo)
+    {
+        if ($tipo->Key == "PRI") {
+            $tipofinal = "hidden";
+        } else {
+            if ($tipo->Type == "datetime") {
+                $tipofinal = "date";
+            }
+            if ($tipo->Type == "int") {
+                $tipofinal = "number";
+            } else {
+                $tipofinal = "text";
+            }
+        }
 
+        return $tipofinal;
+    }
+
+    function classesView()
+    {
+        //formulários
+        foreach ($this->tabelas as $tabela) {
+            $nomeTabela = array_values((array) $tabela)[0];
+            $atributos = $this->buscaAtributos($nomeTabela);
+            $formCampos = "";
+            foreach ($atributos as $atributo) {
+                $tipo = $this->verificaTipo($atributo);
+                $campo = $atributo->Field;
+                $labelTexto = ucfirst(str_replace('_', ' ', $campo));
+                
+                if ($tipo == "hidden") {
+                    $formCampos .= "\n<input type='hidden' id='{$campo}' name='{$campo}' value='<?php echo \$obj?\$obj['{$campo}']:''; ?>'>\n";
+                } else {
+                    $required = ($tipo != "hidden") ? "required" : "";
+                    $formCampos .= "\n<div class=\"campo-grupo\">\n";
+                    $formCampos .= "<label for='{$campo}'>{$labelTexto}</label>\n";
+                    $formCampos .= "<input type='{$tipo}' id='{$campo}' name='{$campo}' value='<?php echo \$obj?\$obj['{$campo}']:''; ?>' {$required}>\n";
+                    $formCampos .= " </div>\n";
+                }
+            }
+            $conteudo = <<<HTML
+<?php
+    require_once('../dao/{$nomeTabela}Dao.php');
+    \$obj=null;
+    if(isset(\$_GET['id']))
+        \$obj=(new {$nomeTabela}Dao())->buscaPorId(\$_GET['id']);
+
+    \$acao=\$obj? 3:1; 
+    \$nome = \$acao == 1 ? "Cadastrar" : "Editar";
+?>
+<!DOCTYPE html>
+<html lang="pt-br">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title><?= \$nome ?> de {$nomeTabela}</title>
+        <link rel="stylesheet" href="../../estilos.css">
+    </head>
+    <body class="form-page">
+        <div class="container">
+            <form id="form-{$nomeTabela}" class="form-moderno" action="../control/{$nomeTabela}Control.php?a=<?php echo \$acao ?><?php if(isset(\$_GET['id'])) {echo '&id='.\$_GET['id'];} ?>" method="post">
+                <h2><?= \$nome ?> {$nomeTabela}</h2>
+                {$formCampos}
+                <button type="submit" class="btn-submit"><?= \$acao == 1 ? 'Cadastrar' : 'Atualizar' ?></button>
+            </form>
+        </div>
+    </body>
+</html>
+HTML;
+            file_put_contents("sistema/view/{$nomeTabela}.php", $conteudo); // Exemplo salvando como arquivo
+        }
+        //Listas
+        foreach ($this->tabelas as $tabela) {
+            $nomeTabela = array_values((array)$tabela)[0];
+            $nomeTabelaUC = ucfirst($nomeTabela);
+            $atributos = $this->buscaAtributos($nomeTabela);
+            $attr = "";
+            $id = "";
+            foreach ($atributos as $atributo) {
+                if ($atributo->Key == "PRI")
+                    $id = "{\$dado['{$atributo->Field}']}";
+
+                $attr .= "echo \"<td>{\$dado['{$atributo->Field}']}</td>\";\n";
+            }
+            // th
+            $cabecalhos = "";
+            foreach ($atributos as $atributo) {
+                $labelCabecalho = ucfirst(str_replace('_', ' ', $atributo->Field));
+                $cabecalhos .= "        echo \"<th>{$labelCabecalho}</th>\";\n";
+            }
+            
+            $conteudo = <<<HTML
+<!DOCTYPE html>
+<html lang="pt-br">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Lista de {$nomeTabela}</title>
+        <link rel="stylesheet" href="../../estilos.css">
+    </head>
+    <body class="form-page">
+        <div class="tabela-container">
+            <h2>Lista de {$nomeTabela}</h2>
+            <a href="../view/{$nomeTabela}.php" class="btn">+ Novo {$nomeTabela}</a>
+            
+            <?php
+            require_once("../dao/{$nomeTabela}Dao.php");
+            \$dao = new {$nomeTabela}DAO();
+            \$dados = \$dao->listaGeral();
+            
+            if (!empty(\$dados)) {
+                echo "<table>";
+                echo "<tr>";
+                {$cabecalhos}
+                echo "<th>Ações</th>";
+                echo "</tr>";
+                
+                foreach(\$dados as \$dado) {
+                    echo "<tr>";
+                        {$attr}
+                    echo "<td>";
+                    echo "<a href='../view/{$nomeTabela}.php?id={$id}'>✏️ Editar</a> ";
+                    echo "<a href='../control/{$nomeTabela}Control.php?id={$id}&a=2' onclick='return confirm(\"Tem certeza que deseja excluir?\")' style='color: #ff4757;'>🗑️ Excluir</a>";
+                    echo "</td>";
+                    echo "</tr>";
+                }
+                echo "</table>";
+            } else {
+                echo "<p style='text-align: center; color: #666; margin-top: 2rem;'>Nenhum registro encontrado.</p>";
+            }
+            ?>
+        </div>
+    </body>
+</html>
+HTML;
+            file_put_contents("sistema/view/lista{$nomeTabelaUC}.php", $conteudo);
+        }
+    } //fimView
+    function criaIndex(){
+        $listagem = "";
+        $forms = "";
+        foreach ($this->tabelas as $tabela) {
+            $nomeTabela = array_values((array)$tabela)[0];
+            $nomeTabelaUC = ucfirst($nomeTabela);
+            $listagem .= "<a href='./view/lista{$nomeTabelaUC}.php' class='dropdown-link' target='iframe'>{$nomeTabelaUC}</a>\n";
+            $forms .= "<a href='./view/{$nomeTabelaUC}.php'  class='dropdown-link' target='iframe' >{$nomeTabelaUC}</a>\n";
+
+        }
+        $conteudo = <<<HTML
+        <!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu Principal</title>
+    <link rel="stylesheet" href="./css/estilos.css">
+</head>
+<body class="sistema-principal">
+    <div class="header">
+        <div >
+            <div class="logo">$this->nomeSistema</div>
+            
+            <nav class="navbar">
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">📋 Inserir</a>
+                        <div class="dropdown">
+                            {$forms}                           
+                        </div>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">📊 Listar</a>
+                        <div class="dropdown">
+                            {$listagem}
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+    
+    <div class="main-content">
+        <div >
+            <div class="iframe-container">
+                <iframe id="contentFrame" name="iframe" src="inicio.html"  seamless>
+                    Seu navegador não suporta iframes.
+                </iframe>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
+HTML;
+        file_put_contents("sistema/index.php", $conteudo);
+    $paginaInicio = <<<HTML
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bem-vindo ao Sistema</title>
+    <link rel="stylesheet" href="./css/estilos.css">
+</head>
+<body class="inicio-page">
+    <div class="welcome-container">
+        <h1>Bem-vindo!</h1>
+        <p>Esta é a área de conteúdo do sistema.</p>
+        
+        <div class="instruction-text">
+            <p><strong>Como usar:</strong> Selecione uma opção no menu acima para começar a gerenciar seu sistema!</p>
+        </div>
+        
+
+        </div>
+    </div>
+</body>
+</html>
+HTML;
+        file_put_contents("sistema/inicio.html", $paginaInicio);
+    }
 }
 new Creator();

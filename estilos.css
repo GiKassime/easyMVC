@@ -1,81 +1,667 @@
 
-body {
+/* ===== ESTILOS PARA INDEX.PHP (Página de Configuração do Sistema) ===== */
+
+/* Estilo base para página de configuração */
+body.form-page {
     font-family: Arial, sans-serif;
-    background-color: #f2f2f2;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    justify-content: start;
+    align-items: start;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+}
+
+/* ===== ESTILOS PARA O SISTEMA GERADO PELO CREATOR ===== */
+
+/* Estilo base para sistema principal gerado */
+body.sistema-principal {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+
+/* Reset global para o sistema principal */
+.sistema-principal * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* --- Cabeçalho e Navegação do Sistema Gerado --- */
+.header {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    padding: 1rem 0;
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+}
+
+.logo {
+    text-align: center;
+    color: white;
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+}
+
+.navbar {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 15px;
+    padding: 0.5rem;
+}
+
+.nav-menu {
+    list-style: none;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
 }
-form {
-    background-color: white;
-    padding: 20px 30px;
+
+.nav-item {
+    position: relative;
+    margin: 0 1rem;
+}
+
+.nav-link {
+    display: block;
+    color: white;
+    text-decoration: none;
+    padding: 12px 20px;
     border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    width: 300px;
+    transition: all 0.3s ease;
+    font-weight: 500;
 }
+
+.nav-link:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+.dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(15px);
+    min-width: 200px;
+    border-radius: 10px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+
+.nav-item:hover .dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.dropdown-link {
+    display: block;
+    color: #333;
+    text-decoration: none;
+    padding: 12px 20px;
+    transition: all 0.3s ease;
+    border-radius: 8px;
+    margin: 5px;
+}
+
+.dropdown-link:hover {
+    background: rgba(102, 126, 234, 0.1);
+    color: #667eea;
+    transform: translateX(5px);
+}
+
+/* --- Conteúdo Principal e iFrame do Sistema --- */
+.main-content {
+    padding: 0;
+    margin: 0;
+}
+
+.iframe-container {
+    background: transparent;
+    box-shadow: none;
+    height: 100vh;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+        overflow: hidden !important;
+
+}
+
+#contentFrame {
+    width: 100%;
+    height: 100%;
+    border: none;
+    border-radius: 0;
+    margin: 0;
+    padding: 0;
+    overflow: hidden !important;
+}
+
+/* ===== ESTILOS COMPARTILHADOS (INDEX.PHP E SISTEMA GERADO) ===== */
+
+/* --- Estilos modernos para formulários (usados em ambos) --- */
+form {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(15px);
+    padding: 30px 40px;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    width: 70vw;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+}
+form-principal{
+    width: 50vw;
+
+}
+form:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.2);
+}
+
+/* Container principal (usado no index.php) */
 .container {
     display: flex;
     flex-direction: column;
     align-items: center;
     width: 100%;
+    padding: 20px;
+    overflow: hidden;
 }
-.mensagem{
-    background-color:#00c3fe;
-    color: #0000bf;
-    border: 1px solid #0000bf;
-    padding: 10px 15px;
-    border-radius: 8px;
-    margin-bottom: 20px;
+
+/* --- Mensagens de sucesso e erro (usadas no index.php) --- */
+.mensagem {
+    background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+    color: white;
+    border: none;
+    padding: 15px 20px;
+    border-radius: 12px;
+    margin: 0 auto 25px auto;
     width: 100%;
+    max-width: 380px;
     text-align: center;
-    box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    box-shadow: 0 8px 25px rgba(0, 212, 255, 0.3);
+    font-weight: 500;
+    animation: slideIn 0.5s ease;
+    display: block;
 }
+
 .mensagem_erro {
-    background-color: #ffe0e0;
-    color: #a70000;
-    border: 1px solid #ffaaaa;
-    padding: 10px 15px;
-    border-radius: 8px;
-    margin-bottom: 20px;
+    background: linear-gradient(135deg, #ff4757 0%, #ff3838 100%);
+    color: white;
+    border: none;
+    padding: 15px 20px;
+    border-radius: 12px;
+    margin: 0 auto 25px auto;
     width: 100%;
+    max-width: 380px;
     text-align: center;
-    box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    box-shadow: 0 8px 25px rgba(255, 71, 87, 0.3);
+    font-weight: 500;
+    animation: slideIn 0.5s ease;
+    display: block;
 }
-h2 {
+
+/* Títulos dos formulários e páginas */
+h1, h2 {
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
+    color: #2c3e50;
+    font-size: 2rem;
+    font-weight: 600;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
+
+/* Labels estilizados */
 label {
     display: block;
-    margin-bottom: 5px;
-    margin-top: 15px;
-}
-input[type="text"],
-input[type="password"] {
-    width: 100%;
-    padding: 8px;
-    box-sizing: border-box;
-}
-button {
+    margin-bottom: 8px;
     margin-top: 20px;
+    color: #2c3e50;
+    font-weight: 500;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Inputs modernos */
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="number"],
+input[type="date"],
+input[type="time"],
+textarea,
+select {
     width: 100%;
-    padding: 10px;
-    background-color: #4CAF50;
+    padding: 15px 20px;
+    box-sizing: border-box;
+    border: 2px solid rgba(102, 126, 234, 0.2);
+    border-radius: 12px;
+    font-size: 16px;
+    background: rgba(255, 255, 255, 0.8);
+    transition: all 0.3s ease;
+    outline: none;
+    color: #2c3e50;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="email"]:focus,
+input[type="number"]:focus,
+input[type="date"]:focus,
+input[type="time"]:focus,
+textarea:focus,
+select:focus {
+    border-color: #667eea;
+    background: white;
+    box-shadow: 0 0 20px rgba(102, 126, 234, 0.2);
+    transform: translateY(-2px);
+}
+
+/* Botões modernos */
+button,
+input[type="submit"] {
+    margin-top: 25px;
+    width: 100%;
+    padding: 15px 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     border: none;
     color: white;
     font-size: 16px;
-    border-radius: 5px;
+    font-weight: 600;
+    border-radius: 12px;
     cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
 }
-button:hover {
-    background-color: #45a049;
+
+button:hover,
+input[type="submit"]:hover {
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
 }
+
+button:active,
+input[type="submit"]:active {
+    transform: translateY(-1px);
+}
+
+/* Animação de entrada */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* --- Estilos específicos para formulários modernos --- */
+.form-moderno {
+    animation: slideIn 0.6s ease;
+    width: 30vw;
+}
+
+.campo-grupo {
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.campo-grupo label {
+    margin-bottom: 8px;
+    margin-top: 0;
+}
+
+/* Botão específico com efeito especial */
+.btn-submit {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-submit::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+}
+
+.btn-submit:hover::before {
+    left: 100%;
+}
+/* --- ESTILOS ESPECÍFICOS PARA O SISTEMA GERADO --- */
+
+/* Estilos para tabelas modernas (usadas nas listas do sistema) */
 .tabela-container {
-  max-width: 900px;
-  margin: 40px auto 0 auto;
-  padding: 24px;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    width: 95%;
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 30px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(15px);
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    overflow-x: auto;
+    box-sizing: border-box;
+}
+
+/* Estilos para tabelas do sistema gerado */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background: transparent;
+}
+
+table th {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 15px 12px;
+    text-align: left;
+    font-weight: 600;
+    border: none;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+table th:first-child {
+    border-top-left-radius: 12px;
+}
+
+table th:last-child {
+    border-top-right-radius: 12px;
+}
+
+table td {
+    padding: 15px 12px;
+    border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+    color: #2c3e50;
+    font-size: 14px;
+    background: rgba(255, 255, 255, 0.5);
+    transition: all 0.3s ease;
+}
+
+table tr:hover td {
+    background: rgba(102, 126, 234, 0.05);
+    transform: scale(1.01);
+}
+
+table tr:last-child td:first-child {
+    border-bottom-left-radius: 12px;
+    border-bottom: none;
+}
+
+table tr:last-child td:last-child {
+    border-bottom-right-radius: 12px;
+    border-bottom: none;
+}
+
+/* Links de ação nas tabelas do sistema */
+table a {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 500;
+    padding: 5px 10px;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    margin: 0 2px;
+}
+
+table a:hover {
+    background: rgba(102, 126, 234, 0.1);
+    transform: translateY(-1px);
+}
+
+/* Botões de ação nas tabelas do sistema */
+.tabela-container .btn,
+.tabela-container a.btn {
+    display: inline-block;
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    text-decoration: none;
+    border-radius: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    margin: 10px 5px;
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+}
+
+.tabela-container .btn:hover,
+.tabela-container a.btn:hover {
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
+}
+
+/* --- ESTILOS ESPECÍFICOS PARA PÁGINA DE INÍCIO (inicio.html) --- */
+
+/* Container de boas-vindas */
+.welcome-container {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(15px);
+    padding: 60px 50px;
+    border-radius: 25px;
+    text-align: center;
+    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    max-width: 600px;
+    width: 90%;
+    animation: slideIn 0.8s ease;
+    margin: 0 auto;
+}
+
+
+
+/* Títulos específicos da página de início */
+.welcome-container h1 {
+    font-size: 3.2rem;
+    color: white;
+    margin-bottom: 30px;
+    text-shadow: 0 2px 15px rgba(0, 0, 0, 0.3);
+    background: none;
+    -webkit-background-clip: initial;
+    -webkit-text-fill-color: initial;
+    background-clip: initial;
+}
+
+/* Parágrafos da página de início */
+.welcome-container p {
+    font-size: 1.4rem;
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.8;
+    margin-bottom: 40px;
+}
+
+
+
+
+/* Texto de instruções */
+.instruction-text {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+    margin-top: 30px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.instruction-text strong {
+    color: #FFD700;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+
+/* Estilo específico para body da página de início */
+body.inicio-page {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+/* ===== RESPONSIVIDADE (APLICADA A AMBOS) ===== */
+
+@media (max-width: 1024px) {
+    /* Tablets - Ajustes para tabelas do sistema */
+    .tabela-container {
+        width: 98%;
+        padding: 20px;
+        margin: 10px auto;
+    }
+    
+    table {
+        font-size: 13px;
+    }
+    
+    table th,
+    table td {
+        padding: 12px 8px;
+    }
+}
+
+@media (max-width: 768px) {
+    /* Menu responsivo do sistema gerado */
+    .nav-menu {
+        flex-direction: column;
+    }
+
+    .nav-item {
+        margin: 0.5rem 0;
+        width: 100%;
+        text-align: center;
+    }
+
+    .dropdown {
+        position: static;
+        opacity: 1;
+        visibility: visible;
+        transform: none;
+        margin-top: 0.5rem;
+        display: none;
+    }
+
+    .nav-item:hover .dropdown {
+        display: block;
+    }
+
+    /* Responsividade da página de início */
+    .welcome-container {
+        padding: 40px 30px;
+    }
+    
+    .welcome-container h1 {
+        font-size: 2.5rem;
+    }
+    
+    .welcome-container p {
+        font-size: 1.2rem;
+    }
+    
+    .features-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    /* Tabelas responsivas para mobile do sistema */
+    .tabela-container {
+        width: calc(100% - 20px);
+        margin: 10px;
+        padding: 15px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    table {
+        font-size: 11px;
+        min-width: 600px; /* Força scroll horizontal se necessário */
+        white-space: nowrap;
+    }
+    
+    table th,
+    table td {
+        padding: 8px 6px;
+        min-width: 80px; /* Largura mínima para cada coluna */
+    }
+    
+    /* Botões menores em mobile */
+    .tabela-container .btn {
+        padding: 8px 16px;
+        font-size: 12px;
+        margin: 5px 2px;
+    }
+    
+    /* Links de ação menores */
+    table a {
+        padding: 3px 6px;
+        font-size: 11px;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Smartphones pequenos - Ajustes finais */
+    .tabela-container {
+        width: calc(100% - 10px);
+        margin: 5px;
+        padding: 10px;
+    }
+    
+    table {
+        font-size: 10px;
+        min-width: 500px;
+    }
+    
+    table th,
+    table td {
+        padding: 6px 4px;
+        min-width: 60px;
+    }
+    
+    .tabela-container h2 {
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+    }
+
+    /* Responsividade da página de início para smartphones pequenos */
+    .welcome-container {
+        padding: 30px 20px;
+    }
+    
+    .welcome-container h1 {
+        font-size: 2rem;
+    }
+    
+    .welcome-container .emoji {
+        font-size: 3rem;
+    }
 }
