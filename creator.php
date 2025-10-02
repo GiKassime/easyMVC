@@ -479,7 +479,7 @@ HTML;
             $nomeTabela = array_values((array)$tabela)[0];
             $nomeTabelaUC = ucfirst($nomeTabela);
             $listagem .= "<a href='./view/lista{$nomeTabelaUC}.php' class='dropdown-link' target='iframe'>{$nomeTabelaUC}</a>\n";
-            $forms .= "<a href='./view/{$nomeTabelaUC}.php'  class='dropdown-link' target='iframe' >{$nomeTabelaUC}</a>\n";
+            $forms .= "<a href='./view/{$nomeTabela}.php'  class='dropdown-link' target='iframe' >{$nomeTabelaUC}</a>\n";
 
         }
         $conteudo = <<<HTML
