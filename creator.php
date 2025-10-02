@@ -337,7 +337,7 @@ EOT;
         if ($tipo->Key == "PRI") {
             $tipofinal = "hidden";
         } else {
-            if ($tipo->Type == "datetime") {
+            if ($tipo->Type == "date") {
                 $tipofinal = "date";
             }
             if ($tipo->Type == "int") {
