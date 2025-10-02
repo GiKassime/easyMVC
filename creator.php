@@ -220,8 +220,6 @@ class {$nomeClasse}Control {
         {$posts}
         \$this->dao->alterar(\$this->{$nomeTabela}, \$_REQUEST['id']);
     }
-    function buscarId({$nomeClasse} \${$nomeTabela}){}
-
 }
 new {$nomeClasse}Control();
 ?>
